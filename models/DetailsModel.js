@@ -60,7 +60,7 @@ const detailsSchema = new mongoose.Schema(
     projects: [
       {
         name: { type: String },
-        image: { type: String },
+       
       },
     ],
   },

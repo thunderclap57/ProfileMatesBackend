@@ -10,6 +10,7 @@ const detailsSchema = new mongoose.Schema(
     image: { type: String },
     awards: { type: String },
     linkedIn: { type: String },
+    indeed: { type: String },
     certifications: { type: String },
     gitHub: { type: String },
     hackerRank: { type: String },

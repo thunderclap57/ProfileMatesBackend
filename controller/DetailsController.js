@@ -1,10 +1,10 @@
-const Details = require("../models/DetailsModel");
+const details = require("../models/DetailsModel");
 
 const addDetails = async (req, res) => {
      const { id } = req.params;
      const { userId, name, email, phone, dob, image, awards, linkedIn, certifications, gitHub, hackerRank, skills, education, languages_known, references, projects } = req.body;
      try { 
-        const user = await Details.findOneAndUpdate({ userId: userId }, 
+        const user = await details.findOneAndUpdate({ userId: userId }, 
         { name, email, phone, dob, image, awards, linkedIn, certifications, gitHub, hackerRank, skills, education, languages_known, references, projects }, 
         { new: true, upsert: true }); 
         res.json({message:'Updated!'}); 
@@ -12,7 +12,24 @@ const addDetails = async (req, res) => {
         res.status(500).json({ message: error.message }); 
     } 
 };
-
+const getDetails = async (req, res) => {
+console.log(req.params.id)
+    await details.findOne(
+     { userId: req.params.id },
+     
+   ).then((result) => {
+     res.status(200).json({
+       status: "200 ok",
+       message: 'successful',
+    data:result,
+    });
+ }).catch((error)=>{
+    res.status(401).json({
+        status: "unsuccessfull",
+       message: error,
+     });
+ });
+ };
 
 
 // const updateUser = async (req, res) => {
@@ -47,5 +64,6 @@ const addDetails = async (req, res) => {
 
 module.exports = {
   addDetails,
+  getDetails
  // updateUser,
 };

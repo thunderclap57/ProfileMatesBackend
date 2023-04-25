@@ -2,16 +2,19 @@ const express = require("express");
 const router=express.Router();
 
 const{
+    login,
     signUp,
     verifyOTP,
-
 }=require('../controller/UserAuthenticationController');
-const { login } = require("../controller/UserLoginController");
+
 const{
     checkEmail,
     verifyEmail,
     checkPassword
 }=require('../controller/ForgetPasswordController');
+
+//login
+router.post('/login',login);
 
 //signUp
 router.post('/signup',signUp);
@@ -28,5 +31,4 @@ router.post('/verifyEmail',verifyEmail);
 //checking forget password
 router.post('/checkPassword',checkPassword);
 
-router.post("/login/verify", login);
 module.exports = router;

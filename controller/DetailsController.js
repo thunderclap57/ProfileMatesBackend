@@ -12,25 +12,19 @@ const addDetails = async (req, res) => {
         res.status(500).json({ message: error.message }); 
     } 
 };
-const getDetails = async (req, res) => {
-console.log(req.params.id)
-    await details.findOne(
-     { userId: req.params.id },
-     
-   ).then((result) => {
-     res.status(200).json({
-       status: "200 ok",
-       message: 'successful',
-    data:result,
-    });
- }).catch((error)=>{
-    res.status(401).json({
-        status: "unsuccessfull",
-       message: error,
-     });
- });
- };
 
+
+const getDetails= async(req,res)=>{
+   // const id=req.body;
+   // const query = { userId: "6442316ae9046aeb84b8dd8dd" };
+    console.log(req.body.userId);
+     try{
+        const data = await details.findOne({userId: req.body.userId});
+        res.send(data)
+        console.log(data);
+    }catch(error){
+        res.status(404).json({message: error.message})
+    }};
 
 // const updateUser = async (req, res) => {
 //   try {
@@ -64,6 +58,6 @@ console.log(req.params.id)
 
 module.exports = {
   addDetails,
-  getDetails
+  getDetails,
  // updateUser,
 };

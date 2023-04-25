@@ -7,6 +7,6 @@ const { addDetails, getDetails } = require("../controller/DetailsController");
 
 
 router.post("/addDetails",addDetails);
-//router.post("/updateUser",updateUser);
-router.get("/:id",getDetails);
+router.post("/getDetails",getDetails);
+
 module.exports = router;

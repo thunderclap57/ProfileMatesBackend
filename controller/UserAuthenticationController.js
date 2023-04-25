@@ -1,16 +1,16 @@
 const user = require("../models/user");
 const userOTPVerification = require("../models/userOTPVerficationModel");
-const Details=require("../models/DetailsModel");
+const Details = require("../models/DetailsModel");
 
-const bcrypt=require("bcrypt");
-const nodemailer=require("nodemailer");
-let transporter=nodemailer.createTransport({
-    service: "gmail",
-    auth:{
-      user:"student407@milagrescollegekallianpur.edu.in",
-      pass: "xbxhknhcfmfaffbq", 
-    },
-  });  
+const bcrypt = require("bcrypt");
+const nodemailer = require("nodemailer");
+let transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: "student407@milagrescollegekallianpur.edu.in",
+    pass: "xbxhknhcfmfaffbq",
+  },
+});
 
  const login= async(req,res)=>{
     const {userId,email,password}=req.body
@@ -28,30 +28,30 @@ let transporter=nodemailer.createTransport({
     }
   };
   
-const signUp=(req, res) => {
+  const signUp = (req, res) => {
     //destructuring- extracting values from an object and assiging them varaibles
-    let{email,password}=req.body
-     if (email === "" || password === "") {
-        res.status(500).json({
+    let { email, password } = req.body;
+    if (email === "" || password === "") {
+      res.status(500).json({
         status: "failed!",
         message: "Enter all the details",
-     });
-    }else if (password.length<8) {
+      });
+    } else if (password.length < 8) {
       res.status(500).json({
-             status: "failed",
-             message: "password too short",
-     });
+        status: "failed",
+        message: "password too short",
+      });
     }
-    user.find({email: email}).then((result)=>{
-     // console.table(result)
-      if(result===null){
+    user.find({ email: email }).then((result) => {
+      // console.table(result)
+      if (result === null) {
         res.json({
-          status:"FAILED",
+          status: "FAILED",
           message: "User with the provided email already exists",
         });
-      }else{
-        const saltrounds=10;
-        bcrypt.hash(req.body.password,saltrounds,(err,hash)=>{
+      } else {
+        const saltrounds = 10;
+        bcrypt.hash(req.body.password, saltrounds, (err, hash) => {
           if (err) {
             res.status(401).json({
               error: err,
@@ -63,83 +63,79 @@ const signUp=(req, res) => {
               email: req.body.email,
               password: hash,
               verified: false,
-        });
-        users.save().then((req)=>{
-              sendOTPVerificationEmail(req,res)
-              console.log(res)
-            })
-             .catch((error)=>{
-            console.log(error);
-            res.status(400).json({
-            error: error,
-              //   res.status(400).json({
-              //  status:"FAILED",
-              //  message:"An error occured while saving user account!",
+            });
+            users
+              .save()
+              .then((req) => {
+                sendOTPVerificationEmail(req, res);
               })
-             })       
-         }
-      })
-      } 
-    })
-  }
+              .catch((error) => {
+                console.log(error);
+                res.status(401).json({
+                  error: error,
+                  //   res.status(400).json({
+                  //  status:"FAILED",
+                  //  message:"An error occured while saving user account!",
+                });
+              });
+          }
+        });
+      }
+    });
+  };
   
-  const sendOTPVerificationEmail=async({id,name, email},res)=>{
-    try{
+  
+  const sendOTPVerificationEmail = async ({ id, name, email }, res) => {
+    try {
       var otp = "";
       const randomchar =
         "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
       for (let i = 0; i < 5; i++) {
         otp += randomchar.charAt(Math.random() * randomchar.length);
-        }
+      }
   
       //mail options
-      const mailOptions={
+      const mailOptions = {
         from: "student407@milagrescollegekallianpur.edu.in",
         to: email,
         subject: "Email verification",
         html: `
-            <div
-              class="container"
-              style="max-width: 90%; margin: auto; padding-top: 20px"
-            >
-        
-              <h2>Welcome to <span style="color: green;"> <img src="https://www.shutterstock.com/image-vector/job-profile-logo-design-element-260nw-602927570.jpg" alt="My_Logo"/>PROFILE MATES</span> .</h2>
-              <h4>You are officially In ✔</h4>
-              <p style="margin-bottom: 30px;">Please enter the sign up OTP to get started</p>
-              <h1 style="font-size: 40px; letter-spacing: 2px; text-align:center;">${otp}</h1>
-         </div>
-          `,
-      }
+              <div
+                class="container"
+                style="max-width: 90%; margin: auto; padding-top: 20px"
+              >
+          
+                <h2>Welcome to <span style="color: green;"> <img src="https://www.shutterstock.com/image-vector/job-profile-logo-design-element-260nw-602927570.jpg" alt="My_Logo"/>PROFILE MATES</span> .</h2>
+                <h4>You are officially In ✔</h4>
+                <p style="margin-bottom: 30px;">Please enter the sign up OTP to get started</p>
+                <h1 style="font-size: 40px; letter-spacing: 2px; text-align:center;">${otp}</h1>
+           </div>
+            `,
+      };
   
       //hash the otp
-      const saltrounds=10;
-      const hashedOTP=await bcrypt.hash(otp,saltrounds);
-      const newOTPVerification= new userOTPVerification({
-        userId:id,
-        otp:hashedOTP,
+      const saltrounds = 10;
+      const hashedOTP = await bcrypt.hash(otp, saltrounds);
+      const newOTPVerification = new userOTPVerification({
+        userId: id,
+        otp: hashedOTP,
         name: name,
         email: email,
         createdAt: Date.now(),
-        expiresAt:Date.now()+3600000,     
-      })
+        expiresAt: Date.now() + 3600000,
+      });
   
       //save otp record
       await newOTPVerification.save();
       await transporter.sendMail(mailOptions);
+      let message = "Verification otp email sent";
+      res.status(200).json({ id, email, message });
+    } catch (error) {
       res.json({
-        status:"PENDING",
-        message:"Verification otp email sent",
-        data:{
-          userId:id,
-          email,
-        }
-      })
-    }catch(error){
-      res.json({
-        status:"FAILED",
-        message:error.message,
-      })        
-    }   
+        status: "FAILED",
+        message: error.message,
+      });
+    }
   };
   
  const verifyOTP= async (req, res) => {

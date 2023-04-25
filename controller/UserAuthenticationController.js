@@ -13,14 +13,13 @@ let transporter=nodemailer.createTransport({
   });  
 
  const login= async(req,res)=>{
-    const {email,password}=req.body
+    const {userId,email,password}=req.body
     const userEmail=await user.findOne({email})
     const pasMatch=await bcrypt.compare(password,userEmail.password)
+    const data = await Details.findOne({userId: req.body.userId});
+    res.send(data)
     if(pasMatch){
-      res.status(200).send({
-        status:true,
-        message:"Login Successful!"
-      });
+      res.status(200).send(data);
     }else{
       res.status(401).send({
         status: false,

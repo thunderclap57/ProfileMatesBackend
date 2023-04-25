@@ -16,7 +16,7 @@ let transporter=nodemailer.createTransport({
     const {userId,email,password}=req.body
     const userEmail=await user.findOne({email})
     const pasMatch=await bcrypt.compare(password,userEmail.password)
-    const data = await Details.findOne({userId: req.body.userId});
+    const data = await Details.findOne({userId: userId});
     res.send(data)
     if(pasMatch){
       res.status(200).send(data);
